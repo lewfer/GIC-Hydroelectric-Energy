@@ -2,7 +2,7 @@ import paho.mqtt.client as mqtt
 from board import D18
 from neopixel import NeoPixel
 
-MQTT_SERVER = "hydrobroker" # Change to name of your publisher 
+MQTT_BROKER = "hydrobroker" # Change to name of your publisher 
 MQTT_TOPIC = "hydro/+"
 
 pixel_pin = D18
@@ -37,7 +37,7 @@ client = mqtt.Client()
 client.on_connect = on_connect
 client.on_message = on_message
  
-client.connect(MQTT_SERVER, 1883, 60)
+client.connect(MQTT_BROKER, 1883, 60)
  
 # Blocking call that processes network traffic, dispatches callbacks and
 # handles reconnecting.
