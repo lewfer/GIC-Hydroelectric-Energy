@@ -5,6 +5,20 @@ from time import sleep
 import random
 from decimal import Decimal
 
+import board
+import busio
+from adafruit_ht16k33 import segments
+
+# Create the I2C interface.
+i2c = busio.I2C(board.SCL, board.SDA)
+
+# Create the LED segment class.
+# This creates a 7 segment 4 character display:
+display = segments.Seg7x4(i2c)
+
+# Clear the display.
+display.fill(0)
+
 MQTT_SERVER = "hydrobroker" # Change to name of your publisher 
 MQTT_TOPIC = "hydro/+"
 
@@ -99,7 +113,14 @@ def randomize_pixels():
     random.shuffle(n)
     return n
 
-
+def reduce_station_energy():
+    # Reduce the energy of each station by 1, to simulate energy being used
+    for i in range(1, num_stations_incl_battery):
+        generated[i] -= 10
+        if generated[i]<0:
+            generated[i] = 0
+        #print("Reducing energy of station", i, "to", generated[i])
+            
 # Main
 # -------------------------------------------------------
 
@@ -132,6 +153,8 @@ try:
         # Reset any existing battery power from previous loop
         generated[0] = 0
 
+        print("New energy generated:", generated)
+
         # Compute how much new energy we have from the stations 
         new_energy = sum(generated)
 
@@ -141,6 +164,9 @@ try:
         print("New energy generated:", new_energy, "Utilisable energy:", utilisable_energy)
         battery_level += for_battery
         print("Energy to battery:", for_battery, "Battery level:", battery_level)
+
+        display.fill("")
+        display.print(battery_level)
 
         # If we need battery backup, add it to generated
         if battery_level>0:
@@ -199,6 +225,8 @@ try:
         # print(allocations)
         # print(pixels)
         pixels.show()
+
+        reduce_station_energy()
 
         sleep(1) #!!
 except KeyboardInterrupt:

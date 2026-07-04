@@ -1,3 +1,5 @@
+# Step 3: Pump water
+
 from hydro_lib import *
 
 hydro = Hydro(1)
@@ -12,25 +14,20 @@ while True:
     else:
         hydro.water_level_led.on()
 
-    # Pump water and read energy
     if hydro.on_off_switch.is_pressed:
         # Power switch is on
         hydro.power_led.on()
-        energy = hydro.get_energy() 
+        hydro.show("ON")
 
         # Only pump if there is enough water in the reservoir
         if water_level_ok:
-            # Turn pump on and send the energy to the village
             hydro.pump_on()
-            hydro.show(energy)
-            hydro.send_energy(energy)          
-        else: 
-            # Turn pump off
+        else:
             hydro.pump_off()
     else:
         # Power switch is off
         hydro.power_led.off()
-        hydro.pump_off()
         hydro.show("OFF")
+        hydro.pump_off()
 
     sleep(0.5)
